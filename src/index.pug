@@ -1,0 +1,11 @@
+extends _layout
+block vars
+  - metas = {}
+  - metas.title = 'firestore'
+block append meta
+  +meta(metas)
+block title
+  title #{metas.title}
+block body
+  .container
+    div main
