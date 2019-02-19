@@ -105,16 +105,73 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   // Override the current require with this new one
   return newRequire;
 })({"main.js":[function(require,module,exports) {
-// Initialize Firebase
-var config = {
-  apiKey: "AIzaSyC6jhwaQlnfRhNnBbW7jAUpA-jTsAw_UOQ",
-  authDomain: "shops-9a76c.firebaseapp.com",
-  databaseURL: "https://shops-9a76c.firebaseio.com",
-  projectId: "shops-9a76c",
-  storageBucket: "shops-9a76c.appspot.com",
-  messagingSenderId: "868347501560"
-};
-firebase.initializeApp(config);
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+
+  var config = {
+    apiKey: "AIzaSyCbwkLe6ZFPLMxAoT7iNjSKEFf6hsCuXZA",
+    authDomain: "test-store-b68ee.firebaseapp.com",
+    databaseURL: "https://test-store-b68ee.firebaseio.com",
+    projectId: "test-store-b68ee",
+    storageBucket: "test-store-b68ee.appspot.com",
+    messagingSenderId: "184450022187"
+  };
+  firebase.initializeApp(config);
+  var db = firebase.firestore();
+  var auth = firebase.auth(); // const settings = { timestampsInSnapshots: true }
+  // db.settings(settings)
+
+  var form = document.querySelector('#form');
+  var input = document.querySelector('#input');
+  var btn = document.querySelector('#btn');
+  var ul = document.querySelector('#ul');
+  var login = document.querySelector('#login');
+  var logout = document.querySelector('#logout');
+  var collection = db.collection('atom');
+  login.addEventListener('click', function () {
+    auth.signInAnonymously();
+  });
+  logout.addEventListener('click', function () {
+    auth.signOut();
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var value = input.value.trim();
+    if (value === "") return; // ダイレクト記載分
+    // let li = document.createElement('li')
+    // li.textContent = value
+    // ul.appendChild(li)
+
+    collection.add({
+      message: input.value,
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function (doc) {
+      console.log("".concat(doc.id));
+      input.value = '';
+      input.focus();
+    }).catch(function (error) {
+      console.error(error);
+    });
+    input.focus();
+  });
+  auth.onAuthStateChanged(function (user) {
+    if (user) {
+      collection.orderBy('created_at', 'desc').onSnapshot(function (snapshot) {
+        snapshot.docChanges().forEach(function (change) {
+          if (change.type === 'added') {
+            var li = document.createElement('li');
+            li.textContent = "data: ".concat(change.doc.data().message, " ");
+            ul.appendChild(li);
+          }
+        });
+      });
+      console.log("uid: ".concat(user.uid));
+      return;
+    }
+
+    console.log('Nobody is login');
+  });
+});
 },{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -142,7 +199,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65200" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58514" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
